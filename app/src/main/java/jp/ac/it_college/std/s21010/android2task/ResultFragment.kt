@@ -5,36 +5,34 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.Navigation
+import androidx.navigation.fragment.navArgs
+import jp.ac.it_college.std.s21010.android2task.databinding.FragmentResultBinding
 
 
 class ResultFragment : Fragment() {
-    private var param1: String? = null
-    private var param2: String? = null
+    private var _binding: FragmentResultBinding? = null
+    private val binding get() = _binding!!
+    private val args: ResultFragmentArgs by navArgs()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_result, container, false)
-    }
 
-    companion object {
+    ): View {
 
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ResultFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+        _binding = FragmentResultBinding.inflate(inflater, container, false)
+
+        binding.button.setOnClickListener {
+            Navigation.findNavController(it).navigate(
+                ResultFragmentDirections.actionResultFragmentToGenerationFragment()
+            )
+        }
+        val score = args.score
+        binding.textView4.text = getString(R.string.enpty, score)
+
+        return binding.root
     }
 }
