@@ -1,22 +1,90 @@
 package jp.ac.it_college.std.s21010.android2task
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.UiThread
+import androidx.annotation.WorkerThread
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.navArgs
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.squareup.picasso.Picasso
 import jp.ac.it_college.std.s21010.android2task.databinding.FragmentQuestionBinding
+import jp.ac.it_college.std.s21010.android2task.json.ImagePoke
+import jp.ac.it_college.std.s21010.android2task.json.Pokemon
+import jp.ac.it_college.std.s21010.android2task.json.poked
+import jp.ac.it_college.std.s21010.android2task.service.PokemonService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
+import kotlin.collections.EmptyList.forEach
+import kotlin.collections.EmptyMap.forEach
 
 
 class QuestionFragment : Fragment() {
     private var _binding: FragmentQuestionBinding? = null
-    private val binding get() = null
+    private val binding get() = _binding!!
+    private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+    private val args: QuestionFragment by navArgs()
+    private val BASE_URL = "https://pokeapi.co/api/v2/"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_question, container, false)
+        _binding = FragmentQuestionBinding.inflate(inflater, container, false)
+        binding.gen.text = getString(R.string.gen_select, args.num)
+        fun gens() {
+            poked.forEach { g ->
+                g.entries.map { e -> e.pokemon_id }.toIntArray()
+
+                args.num
+            }
+        }
+
+        return binding.root
+
+    }
+
+
+
+    @UiThread
+    private fun showPokeImg(id: Int) {
+        lifecycleScope.launch {
+            val info = getPokemonImg(id)
+            setPokemonInfo(info)
+        }
+    }
+
+    @WorkerThread
+    private suspend fun getPokemonImg(id: Int): poked {
+        return withContext(Dispatchers.IO) {
+            val retrofit = Retrofit.Builder().apply {
+                baseUrl(BASE_URL)
+                addConverterFactory(MoshiConverterFactory.create(moshi))
+            }.build()
+
+            val service: PokemonService = retrofit.create(PokemonService::class.java)
+            try {
+                service.getPokemon(id).execute().body()
+                    ?: throw IllegalStateException("ポケモンの情報が取れません")
+            } catch (e: Exception) {
+                throw IllegalStateException("なにか例外が発生しました。", e)
+            }
+        }
+    }
+
+
+    @UiThread
+    private fun setPokemonInfo(info: ImagePoke) {
+        val IMG_URL = info.sprites.other.officialArtwork.frontDefault
+        Picasso.get().load(IMG_URL).into(binding.viPokemon)
+        binding.viPokemon.setColorFilter(Color.rgb(0, 0, 0))
     }
 }

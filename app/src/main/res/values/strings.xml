@@ -21,6 +21,8 @@
     <string name="empty">%d</string>
     <string name="display">世代選択画面に戻る</string>
     <string name="result">正解数</string>
+    <string name="who">だれだ？</string>
+
 
 
 </resources>
