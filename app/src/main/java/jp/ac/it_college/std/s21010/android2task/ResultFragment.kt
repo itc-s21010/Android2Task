@@ -31,7 +31,7 @@ class ResultFragment : Fragment() {
             )
         }
         val score = args.score
-        binding.textView4.text = getString(R.string.enpty, score)
+        binding.textView4.text = getString(R.string.empty, score)
 
         return binding.root
     }
