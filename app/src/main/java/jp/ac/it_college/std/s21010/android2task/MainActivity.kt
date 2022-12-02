@@ -1,8 +1,10 @@
 package jp.ac.it_college.std.s21010.android2task
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupWithNavController
 import jp.ac.it_college.std.s21010.android2task.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -12,9 +14,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
+        val navController =
+            binding.fragmentContainerView.getFragment<NavHostFragment>().navController
+        binding.toolbar.setupWithNavController(
+            navController,
+            AppBarConfiguration(navController.graph)
         )
-    }
-        }
     }
 }

@@ -21,7 +21,7 @@ class TitleFragment : Fragment() {
     ): View? {
         _binding = FragmentTitleBinding.inflate(inflater, container, false)
 
-        binding.toStart.setOnClickListener {
+        binding.btStart.setOnClickListener {
             Navigation.findNavController(it).navigate(
                 TitleFragmentDirections.actionTitleFragmentToGenerationFragment().apply {  }
             )
